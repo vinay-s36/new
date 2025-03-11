@@ -1,52 +1,34 @@
 function transfer() {
-  var tablink;
-  chrome.tabs.getSelected(null, function (tab) {
-    const original_url = tab.url
-    console.log(original_url);
-    // alert(original_url);
-    tablink = tab.url;
-    if (tablink.length > 30) {
-      tablink = tablink.slice(0, 30) + ' ...';
-    }
-    $('#site').text(tablink);
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (tabs.length === 0) return;
 
-    var xhr = new XMLHttpRequest();
-    params = 'url=' + original_url;
-    var markup =
-      'url=' + original_url + '&html=' + document.documentElement.innerHTML;
-	xhr.open("POST","http://localhost:8000",true);
-    //alert(xhr.status);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.send(markup);
-    $('#loader').removeClass('hidden'); // Show the spinner
-    xhr.onload = () => {
-      // alert(xhr.responseText);
-       $('#loader').addClass('hidden'); // Hide the spinner
-      if (xhr.responseText === 'SAFE') {
-        $('#div1').text(xhr.responseText);
-      } else {
-        $('#div2').text(xhr.responseText);
-      }
-      return xhr.responseText;
-    };
+    const test_url = tabs[0].url;
+    console.log("Sending URL:", test_url);
 
+    document.getElementById('loader').classList.remove('hidden');
+
+    fetch("http://localhost:8000/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: test_url })
+    })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('loader').classList.add('hidden');
+
+        if (data.result === "SAFE") {
+          document.getElementById('div1').textContent = data.result;
+        } else {
+          document.getElementById('div2').textContent = data.result;
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById('loader').classList.add('hidden');
+      });
   });
 }
 
-function hello(){
-   console.log("Hello");
-}
-$(document).ready(function () {
-  $('button').click(function () {
-    var val = transfer();
-    // hello();
-  });
-});
-
-chrome.tabs.getSelected(null, function (tab) {
-  var tablink = tab.url;
-  if (tablink.length > 30) {
-    tablink = tablink.slice(0, 30) + ' ....';
-  }
-  $('#site').text(tablink + '\n\n');
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelector("button").addEventListener("click", transfer);
 });

@@ -1,7 +1,4 @@
-# To extract  the features from a web page during testing.
-
-import sys
-
+import patterns
 import requests
 from googlesearch import search
 from bs4 import BeautifulSoup
@@ -12,20 +9,6 @@ import socket
 import whois
 from datetime import datetime
 import time
-from dotenv import load_dotenv
-import os
-sys.path.append("F:\Sanchalak")
-import site
-site.addsitedir('F:/Sanchalak')
-print(os.listdir())
-
-from sanchalak import patterns
-
-load_dotenv()
-LOCALHOST_PATH = os.getenv("LOCALHOST_PATH")
-DIRECTORY_NAME = os.getenv("DIRECTORY_NAME")
-MODEL_PATH = os.getenv("MODEL_PATH")
-MODEL_PATH_RF = os.getenv("MODEL_PATH_RF")
 
 
 def having_ip_address(url):
@@ -232,6 +215,8 @@ def abnormal_url(domain, url):
     hostname = domain.name
     match = re.search(hostname, url)
     return 1 if match else -1
+
+
 def website_redirect(response):
     if response == "":
         return -1
@@ -241,14 +226,16 @@ def website_redirect(response):
         else:
             return -1
 
+
 def mouseOver(response):
-  if response == "" :
-    return -1
-  else:
-    if re.findall("<script>.+onmouseover.+</script>", response.text):
-      return -1
+    if response == "":
+        return -1
     else:
-      return 1
+        if re.findall("<script>.+onmouseover.+</script>", response.text):
+            return -1
+        else:
+            return 1
+
 
 def rightClick(response):
     if response == "":
@@ -258,7 +245,6 @@ def rightClick(response):
             return 1
         else:
             return -1
-
 
 
 # IFrame Redirection
@@ -339,19 +325,13 @@ def get_hostname_from_url(url):
 
 
 def main(url):
-    # with open(LOCALHOST_PATH + DIRECTORY_NAME + '/markup.txt', 'rb') as file:
-    #     soup_string = file.read()
-    import requests
-    # response = requests.get(url)
     from urllib.request import urlopen
     soup = None
     try:
         response = urlopen(url).read()
-        # print(response)
         soup = BeautifulSoup(response, "html.parser")
     except Exception as e:
         print(e)
-    # soup = BeautifulSoup(soup_string, 'html.parser')
 
     status = []
     hostname = get_hostname_from_url(url)
@@ -406,6 +386,7 @@ def main(url):
           '17. Website Redirect\n18. Mouse Over\n19. Right Click\n20. IFrame\n21. Age of Domain\n22. DNS Record\n23. Web Traffic\n24. Google Index\n25. Statistical Report\n')
     print(status, len(status))
     return status
+
 
 r = statistical_report("https://faacebok.zapto.org/", "faacebok.zapto.org")
 print(r)
