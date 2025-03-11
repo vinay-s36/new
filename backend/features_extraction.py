@@ -2,8 +2,8 @@ import patterns
 import requests
 from googlesearch import search
 from bs4 import BeautifulSoup
-import urllib
 import bs4
+import urllib
 import re
 import socket
 import whois
