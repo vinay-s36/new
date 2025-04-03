@@ -16,10 +16,13 @@ function transfer() {
       .then(data => {
         document.getElementById('loader').classList.add('hidden');
 
-        if (data.result === "SAFE") {
-          document.getElementById('div1').textContent = data.result;
-        } else {
-          document.getElementById('div2').textContent = data.result;
+        if (data.prediction == 'benign') {
+          document.getElementById('div1').style.color = "green";
+          document.getElementById('div1').textContent = "SAFE";
+        }
+        else {
+          document.getElementById('div2').style.color = "red";
+          document.getElementById('div2').textContent = "NOT SAFE";
         }
       })
       .catch(error => {
